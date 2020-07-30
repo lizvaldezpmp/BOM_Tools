@@ -659,7 +659,7 @@ def normalize_boms (orig_bom_directory, output_file_directory):
         file_with_path = orig_bom_directory + "/" + filename
 #        print ("file with path = ", file_with_path)
 #        print ("output file = ", output_file_directory )
-        if filename.endswith(".xls") or filename.endswith(".xlsx") or filename.endswith(".XLS") or filename.endswith(".XLSX"):
+        if filename.endswith(".xls") or filename.endswith(".xlsx") or filename.endswith(".XLSX") or filename.endswith(".XLS"):
 #            print("file with path =", file_with_path)
             norm_error = bom_norm(file_with_path, output_file_directory)
             if norm_error:
