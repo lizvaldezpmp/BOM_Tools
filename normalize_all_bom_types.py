@@ -515,6 +515,7 @@ def bom_norm(input_file, output_file_directory):
                 elif bom_type == "S4":
     
                     part_num = str(df.loc[row_index,mfg_pn[0]])
+    #			part_num = str(df.loc[row_index,xp_pn[0]])
     #                print ("part num is", part_num)
     #                print("data frame is")
     #                print(df.to_string(index=False))
@@ -658,7 +659,7 @@ def normalize_boms (orig_bom_directory, output_file_directory):
         file_with_path = orig_bom_directory + "/" + filename
 #        print ("file with path = ", file_with_path)
 #        print ("output file = ", output_file_directory )
-        if filename.endswith(".xls") or filename.endswith(".xlsx"):
+        if filename.endswith(".xls") or filename.endswith(".xlsx") or filename.endswith(".XLS") or filename.endswith(".XLSX"):
 #            print("file with path =", file_with_path)
             norm_error = bom_norm(file_with_path, output_file_directory)
             if norm_error:
