@@ -25,7 +25,7 @@ from pathlib import Path
 global row_num_found, xp_pn_found,  mfg_pn_found, quantity_found,description_found, level_found, ref_des_found
 global unit_of_measure_found,  manufacturer_found, comp_text_found, rev_level_found
 global bom_tab_name, first_tab_of_input_bom, bom_type
-global sort_key_col_name, file_col_name, final_column_order
+global xp_sort_key_col_name, mfg_sort_key_col_name, file_col_name, final_column_order
 global row_num, xp_pn, mfg_pn, quantity, description, level_val, ref_des
 global unit_of_measure, manufacturer, comp_text, rev_level
 
@@ -44,7 +44,7 @@ global unit_of_measure, manufacturer, comp_text, rev_level
 def initialize_data():
     global row_num, xp_pn, mfg_pn, quantity, description, level_val, ref_des
     global unit_of_measure, manufacturer, comp_text, rev_level
-    global sort_key_col_name, file_col_name, final_column_order
+    global xp_sort_key_col_name, mfg_sort_key_col_name, file_col_name, final_column_order
     global cost_bom_tab_names
     global row_num_found, xp_pn_found,  mfg_pn_found, quantity_found,description_found, level_found, ref_des_found
     global unit_of_measure_found,  manufacturer_found, comp_text_found, rev_level_found
@@ -57,7 +57,8 @@ def initialize_data():
 
 ### These are names of columns that are going to be added in addition to the columns that are in the BOMs already
    
-    sort_key_col_name = "Sort Key"
+    xp_sort_key_col_name = "XP Sort Key"
+    mfg_sort_key_col_name = "Mfg Sort Key"
     file_col_name = "File"
 
 ### These are the names of the columns that could be in any of the original BOM files.  
@@ -125,7 +126,7 @@ def normalize_column_headers(header):
 
     global row_num, xp_pn, mfg_pn, quantity, description, level_val, ref_des
     global unit_of_measure, manufacturer, comp_text, rev_level
-    global sort_key_col_name, file_col_name, final_column_order
+    global xp_sort_key_col_name, mfg_sort_key_col_name, file_col_name, final_column_order
     global row_num_found, xp_pn_found,  mfg_pn_found, quantity_found,description_found, level_found, ref_des_found
     global unit_of_measure_found,  manufacturer_found, comp_text_found, rev_level_found
     global cost_bom_tab_names
@@ -136,52 +137,52 @@ def normalize_column_headers(header):
     header = header.lower()
 #    print("header is", header)
     
-    if header in row_num:
+    if header in row_num and not row_num_found:
         row_num_found = True   
 #        print("Found row number field")
         return(row_num[0])
         
-    if header in xp_pn: 
+    if header in xp_pn and not xp_pn_found: 
         xp_pn_found = True
 #        print ("Found XP PN field")
         return(xp_pn[0])
     
-    if header in mfg_pn: 
+    if header in mfg_pn and not mfg_pn_found:
         mfg_pn_found = True
 #        print ("found Mfg PN field")
         return(mfg_pn[0])
     
-    if header in quantity: 
+    if header in quantity and not quantity_found:
         quantity_found = True
 #       print ("found quantity field")
         return(quantity[0])
 
-    if header in description: 
+    if header in description and not description_found:
         description_found = True
 #        print("found description field")
         return(description[0])
         
-    if header in level_val: 
+    if header in level_val and not level_found: 
         level_found = True    
 #        print ("found BOM level field")
         return(level_val[0])
     
-    if header in unit_of_measure: 
+    if header in unit_of_measure and not unit_of_measure_found:
         unit_of_measure_found = True
 #        print ("found unit of measure field")
         return(unit_of_measure[0])
     
-    if header in ref_des: 
+    if header in ref_des and not ref_des_found:
         ref_des_found = True
 #        print ("found RefDes field")
         return(ref_des[0])
     
-    if header in comp_text: 
+    if header in comp_text and not comp_text_found:
         comp_text_found = True
 #        print ("found como_text field")
         return(comp_text[0])
     
-    if header in rev_level: 
+    if header in rev_level and not rev_level_found:
         rev_level_found = True
 #        print ("found rev_level field")
         return(rev_level[0])    
@@ -190,7 +191,7 @@ def normalize_column_headers(header):
 ### This is the order of the columns in the unified BOMs.  
 ### Just realized this is dumb place for this...  
 
-    final_column_order = [file_col_name, sort_key_col_name, row_num[0], level_val[0], xp_pn[0], mfg_pn[0], rev_level[0], quantity[0], description[0], comp_text[0],ref_des[0], unit_of_measure[0]]
+    final_column_order = [file_col_name, xp_sort_key_col_name, mfg_sort_key_col_name, row_num[0], level_val[0], xp_pn[0], mfg_pn[0], rev_level[0], quantity[0], description[0], comp_text[0],ref_des[0], unit_of_measure[0]]
 
 #########################################################################################################################    
 ### This is the main BOM normalization function.  It should really be broken down into more subroutines
@@ -207,7 +208,7 @@ def bom_norm(input_file, output_file_directory):
     
     global row_num, xp_pn, mfg_pn, quantity, description, level_val, ref_des
     global unit_of_measure, manufacturer, comp_text, rev_level
-    global sort_key_col_name, file_col_name, final_column_order
+    global xp_sort_key_col_name, mfg_sort_key_col_name, file_col_name, final_column_order
     
 
 ### I will make this a stand-alone routine once I get the global variable situation figured out.
@@ -233,7 +234,8 @@ def bom_norm(input_file, output_file_directory):
     elif "s4" in input_file.lower():
         bom_type = "S4"
         top_left_bom_cell = "Explosion level"
-    elif "vn" in input_file.lower() or "vtn" in input_file.lower() or "vtm" in input_file.lower():
+## ADDED VNM TO FOLLOWING LINE on 8/10/20:
+    elif "vn" in input_file.lower() or "vtn" in input_file.lower() or "vtm" in input_file.lower() or "vnm" in input_file.lower():
         bom_type = "VN"
         top_left_bom_cell = "No."
     else:
@@ -384,7 +386,8 @@ def bom_norm(input_file, output_file_directory):
         #    column_headers = df.columns
     
 ## Add a "sort key" column and fill in the values
-            df.insert(2,sort_key_col_name, "")
+            df.insert(2,xp_sort_key_col_name, "")
+            df.insert(2,mfg_sort_key_col_name, "")
             
 ## Add a "File" column as the first column.  
             df.insert(0,'File', "")
@@ -456,13 +459,14 @@ def bom_norm(input_file, output_file_directory):
             
             for row_index, row in df.iterrows():
 ##############################################################################                
-##  Add sort key for Altium BOMs
+##  Add sort key for Altium BOMs.  The Sort Key will be based on the XP P/N
 ##############################################################################
                 
     #            print("Before BOM-specific logic")
+                df.loc[row_index,file_col_name] = input_file+":"+sheet_name
                 if bom_type == "altium":
                     part_num = str(df.loc[row_index,xp_pn[0]])
-    #               print("row index = ",row_index, "part num =", part_num)
+    #               print("row index = ",row_index, "xp part num =", xp_part_num)
     #                print("in altium part of loop")
                     df.loc[row_index,level_val[0]] = parent_bom_level + 1
                     if(part_num != ""):
@@ -476,17 +480,17 @@ def bom_norm(input_file, output_file_directory):
                             print("ERROR - TOOL DOES NOT SUPPORT ",parent_bom_level, " BOMS")
                             break
         #                print ("Sort key is", sort_key)
-                        df.loc[row_index,sort_key_col_name] = sort_key
-                        df.loc[row_index,file_col_name] = input_file+":"+sheet_name
+                        df.loc[row_index,xp_sort_key_col_name] = sort_key
+                        
                         
 ##############################################################################                
-##  Add sort key for Solidworks BOMs
+##  Add sort key for Solidworks BOMs  The Sort Key will be based on the XP P/N
 ##############################################################################           
                 elif bom_type == "solidworks":
 
 #                    print("in solidworks part of loop")
                     part_num = str(df.loc[row_index,xp_pn[0]])
-#                    print("row index = ",row_index, "part num =", part_num)
+#                    print("row index = ",row_index, "part num =", xp_part_num)
                     #if(part_num != ""):
                     if not pd.isna([part_num]):
 #                        print ("BOM Level is ", df.loc[row_index,level_val[0]])
@@ -499,17 +503,16 @@ def bom_norm(input_file, output_file_directory):
                         
     #                   print ("BOM Level is ", df.loc[row_index,level_val[0]])
     
-                        current_levels[current_bom_level-1] = part_num
+                        current_levels[current_bom_level-1] = xp_part_num
                         for i in range(current_bom_level,4):
                             current_levels[i]= ""
                         sort_key = current_levels[0] + '|' + current_levels[1] + '|' + current_levels[2] + '|' + current_levels[3]
     #                    print("sort key is", sort_key)
-                        df.loc[row_index,sort_key_col_name] = sort_key
+                        df.loc[row_index,xp_sort_key_col_name] = sort_key
                         
 ##############################################################################                
-##  Add sort key for S4 BOMs
+##  Add sort key for S4 BOMs  The Sort Key will be based on the Mfg P/N
 ##  It is largely the same as for the 4thShift BOM.  Make this more efficient.
-##  For now, assume the S4 PN is the Mfg PN for now.
 ##############################################################################     
                                   
                 elif bom_type == "S4":
@@ -525,7 +528,7 @@ def bom_norm(input_file, output_file_directory):
     #                print ("new bom_level = ", bom_level_string)
                     df.loc[row_index,level_val[0]] = int(bom_level_string[-1])
     
-                    part_num = df.loc[row_index,mfg_pn[0]]
+#  This was in the code twice... Test and remove                    part_num = df.loc[row_index,mfg_pn[0]]
     #                print ("part_num = ", part_num)
                     
     #               print("row index = ",row_index,  "part num =", part_num)
@@ -539,10 +542,10 @@ def bom_norm(input_file, output_file_directory):
                             current_levels[i]= ""
                         sort_key = current_levels[0] + '|' + current_levels[1] + '|' + current_levels[2] + '|' + current_levels[3]
     #                    print("sort key is", sort_key)
-                        df.loc[row_index,sort_key_col_name] = sort_key      
+                        df.loc[row_index,mfg_sort_key_col_name] = sort_key 
  
 ##############################################################################                
-##  Add sort key for 4thShift BOMs
+##  Add sort key for 4thShift BOMs.  Sort Key will be based on XP P/N
 ##############################################################################     
                  
                 elif bom_type == "4thshift":
@@ -561,30 +564,51 @@ def bom_norm(input_file, output_file_directory):
                             current_levels[i]= ""
                         sort_key = current_levels[0] + '|' + current_levels[1] + '|' + current_levels[2] + '|' + current_levels[3]
     #                    print("sort key is", sort_key)
-                        df.loc[row_index,sort_key_col_name] = sort_key    
+                        df.loc[row_index,xp_sort_key_col_name] = sort_key
                     
 ##############################################################################                
-##  Add sort key for WIP and VN BOMs
-##  The code is very similar to 4thShift BOM.  Make this more efficient.
+##  Add sort key for WIP and VN BOMs - for both XP P/N and Mfg P/N
+##  Make this more efficient.
 ##############################################################################     
                           
                 elif bom_type == "WIP_Bom" or bom_type == "VN":
-
-                    part_num = str(df.loc[row_index,xp_pn[0]])
-    #                print("row index = ",row_index, "part num =", part_num)
-                    if(part_num != ""): 
+#### THIS IS WHERE THE PART NUMBER IS SET FOR THE EXCEL BOM - EITHER MFG PN OR THE XP PART NUMBER
+                    mfg_part_num = str(df.loc[row_index,mfg_pn[0]])
+#                    print("row index = ",row_index, "mfg part num =", mfg_part_num)
+                    if(mfg_part_num != ""): 
+#                        print("part_num is not null")
                         if df.loc[row_index,level_val[0]] != "": 
+#                            print("Level is not null")
                             current_bom_level = int(df.loc[row_index,level_val[0]])
-        #                    print ("BOM Level is ", df.loc[row_index,level_val[0]])
-                            current_levels[current_bom_level-1] = part_num
+#                            print ("BOM Level is ", df.loc[row_index,level_val[0]])
+                            current_levels[current_bom_level-1] = mfg_part_num
+                            for i in range(current_bom_level,4):
+                                current_levels[i]= ""
+                            sort_key = current_levels[0] + '|' + current_levels[1] + '|' + current_levels[2] + '|' + current_levels[3]
+        #                    print("mfg sort key is", sort_key)
+                            df.loc[row_index,mfg_sort_key_col_name] = sort_key
+                        else:
+                            print("BOM level is missing.  Fix file and re-run")
+                            break
+                        
+                    xp_part_num = str(df.loc[row_index,xp_pn[0]])
+#                    print("row index = ",row_index, "XP part num =", xp_part_num)
+                    if(xp_part_num != ""): 
+#                        print("xp part_num is not null")
+                        if df.loc[row_index,level_val[0]] != "": 
+#                            print("Level is not null")
+                            current_bom_level = int(df.loc[row_index,level_val[0]])
+#                            print ("BOM Level is ", df.loc[row_index,level_val[0]])
+                            current_levels[current_bom_level-1] = xp_part_num
                             for i in range(current_bom_level,4):
                                 current_levels[i]= ""
                             sort_key = current_levels[0] + '|' + current_levels[1] + '|' + current_levels[2] + '|' + current_levels[3]
         #                    print("sort key is", sort_key)
-                            df.loc[row_index,sort_key_col_name] = sort_key           
+                            df.loc[row_index,xp_sort_key_col_name] = sort_key
                         else:
                             print("BOM level is missing.  Fix file and re-run")
                             break
+
                 else:
                     
 ##############################################################################                
@@ -593,8 +617,7 @@ def bom_norm(input_file, output_file_directory):
 ##############################################################################     
                     print ("CODE NOT YET IMPLEMENTED FOR THIS BOM TYPE")
     
-## Add the file and sheet name to the file column.  (Probably a better way to do this)
-                df.loc[row_index,file_col_name] = input_file+":"+sheet_name
+
         
     #        print("columns are ", df.columns)         
             column_headers = df.columns
@@ -640,13 +663,15 @@ def bom_norm(input_file, output_file_directory):
 
                 df.to_csv(output_file_name, index = False, mode='a', header=False)
     
-            print("Normalized>>", input_file, ": ", sheet_name)
+            print("Normalized>>", input_file)
             return_error = False
 
 ###########################################################################
 ### Main Program Starts Here
 ###########################################################################
 def normalize_boms (orig_bom_directory, output_file_directory):
+    
+    
 
 #    print ("orig_bom_directory is", orig_bom_directory, " output_file_diretory = ", output_file_directory)
  
@@ -659,16 +684,24 @@ def normalize_boms (orig_bom_directory, output_file_directory):
 #        print ("file with path = ", file_with_path)
 #        print ("output file = ", output_file_directory )
         if filename.endswith(".xls") or filename.endswith(".xlsx"):
-#            print("file with path =", file_with_path)
+## ADDED NEXT LINE ON 8/10/20 
+            print("")
+            print("Processing file:  ", filename)
             norm_error = bom_norm(file_with_path, output_file_directory)
             if norm_error:
                 print("Error - file cannot be normalized")
                 break
 
-
+    print("")
+    print("NEXT STEP:  If no errors were reported, run the 'Unify Norm Boms' program on the output directory")
 # The following makes this program start running at normalize_all() 
 # when executed as a stand-alone program.    
 if __name__ == '__main__':
-    normalize_boms(sys.argv[1], sys.argv[2])
+    if len(sys.argv) != 3:
+        print ("ERROR:  Re-run program with input_bom and output_bom directories")
+        sys.exit(1)
+    else:
+        normalize_boms(sys.argv[1], sys.argv[2])
+
    
     
